@@ -1,0 +1,18 @@
+# Compiled Verilator outputs
+obj_dir/
+.vcd
+.vvp
+*.log
+*.o
+*.vcd
+*.vpd
+*.d
+*.pyc
+__pycache__/
+
+# Editor/OS-specific
+*.swp
+*.bak
+.DS_Store
+EOF
+
