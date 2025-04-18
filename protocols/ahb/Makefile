@@ -1,36 +1,33 @@
 # Top-level Makefile in protocols/ahb
 
 # Tool & paths
-VERILATOR = verilator
+IVERILOG = iverilog
+VVP = vvp
 SRC_DIR = rtl
 TB_DIR = tb
-BUILD_DIR = obj_dir
+BUILD_DIR = build
 TOP_MODULE = tb_ahb_top
 VCD_FILE = dump.vcd
+OUT_FILE = $(BUILD_DIR)/$(TOP_MODULE).vvp
 
 # Source files
 RTL_SRCS = $(SRC_DIR)/ahb_slave.sv $(SRC_DIR)/ahb_master.sv
 TB_SRCS = $(TB_DIR)/$(TOP_MODULE).sv
+SRCS = $(RTL_SRCS) $(TB_SRCS)
 
-# Default target: build & run
-all: build run
+# Default target
+all: $(OUT_FILE) run
 
-
-build:
-	$(VERILATOR) --Wall --cc --exe --trace \
-	  --timing -Wno-UNUSED \
-		$(RTL_SRCS) $(TB_SRCS) \
-		-CFLAGS "-std=c++11" \
-		--top-module $(TOP_MODULE) \
-		--Mdir obj_dir \
-		-o $(TOP_MODULE)_sim
+$(OUT_FILE): $(SRCS)
+	@mkdir -p $(BUILD_DIR)
+	$(IVERILOG) -g2012 -o $@ $(SRCS)
 
 run:
-	./$(TOP_MODULE)_sim
+	$(VVP) $(OUT_FILE)
 	@echo "Simulation complete. VCD dumped to $(VCD_FILE)"
 
 gtkwave:
 	gtkwave $(VCD_FILE) &
 
 clean:
-
+	rm -rf $(BUILD_DIR) $(VCD_FILE)
